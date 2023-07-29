@@ -4,12 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
+use Laravel\Jetstream\Jetstream;
+use App\Actions\Fortify\PasswordValidationRules;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    
+    use PasswordValidationRules;
+
     public function index()
     {
         return view('user-manager.index', [
@@ -22,7 +32,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        return view('user-manager.create');
     }
 
     /**
@@ -30,7 +40,19 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => $this->passwordRules()
+        ])->validate();
+
+        User::create([
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'password' => Hash::make($request['password']),
+        ]);
+
+        return redirect()->route('user-manager.index');
     }
 
     /**
