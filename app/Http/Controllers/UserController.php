@@ -17,7 +17,7 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    
+
     use PasswordValidationRules;
 
     public function index()
@@ -60,7 +60,9 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $user = User::find($id);
+        $parameters = ['user' => $user];
+        return view('user-manager.show', $parameters);
     }
 
     /**
@@ -68,7 +70,9 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $user = User::find($id);
+        $parameters = ['user' => $user];
+        return view('user-manager.edit', $parameters);
     }
 
     /**
