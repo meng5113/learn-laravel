@@ -80,7 +80,16 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $user = User::find($id);
+
+        Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+        ])->validate();
+
+        $user->update($request->all());
+
+        return redirect()->route('user-manager.show', $user->id);
     }
 
     /**
@@ -88,6 +97,10 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::find($id);
+        $user->deleteProfilePhoto();
+        $user->tokens->each->delete();
+        $user->delete();
+        return redirect()->route('user-manager.index');
     }
 }
